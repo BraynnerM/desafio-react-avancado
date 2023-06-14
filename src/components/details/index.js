@@ -1,14 +1,9 @@
+import React from "react";
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { themes } from '../../contexts/theme-context';
-
-async function getAbilityDetails(url) {
-    const response = await fetch(url);
-    const data = await response.json();
-    return data;
-};
 
 const PokeDetails = () => {
     const [details, setDetails] = useState({});
@@ -19,6 +14,11 @@ const PokeDetails = () => {
             const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}/`);
             const data = await response.json();
             setDetails(data);
+            async function getAbilityDetails(url) {
+                const response = await fetch(url);
+                const data = await response.json();
+                return data;
+            };
             const abilitiesData = await Promise.all(
                 data.abilities.map(async ability => {
                     const abilityDetails = await getAbilityDetails(ability.ability.url);
@@ -36,9 +36,9 @@ const PokeDetails = () => {
     return (
         <Section>
             <Div>
-                <Img src={details.sprites?.other?.dream_world?.front_default} alt={`${details.name}`} />
+                <Img src={details.sprites?.other?.['official-artwork']?.front_default} alt={`${details.name}`} />
                 <H2>{details.name}</H2>
-                <Ulm>                    
+                <Ulm>
                     <li>
                         <P>Movimentos:</P>
                         <Ul>
@@ -72,7 +72,6 @@ const PokeDetails = () => {
                 </Ulm>
                 <StyledLink to="/">Voltar para a Home</StyledLink>
             </Div>
-            
         </Section>
     );
 };
@@ -121,7 +120,8 @@ const Div = styled.div`
     border: 0.5vh solid;  
     border-radius: 10px;
     gap: 15px;  
-    margin-bottom:15px;    
+    margin-bottom:15px;
+    box-shadow: 0 0 25px ${({ theme }) => theme.shadowColor};     
     @media (max-width: 480px) {
         width: 40vw;     
     }         
@@ -187,11 +187,12 @@ const Ul = styled.ul`
     display: flex;
     flex-flow: column wrap;
     max-height: 50vh;
-    padding-left: 3vh;   
+    padding-left: 3vh;       
     text-align: justify;
     padding-right:2vh;
     column-fill: auto;
-    overflow: auto;        
+    overflow: auto; 
+    gap: 30px;       
     @media (max-width: 1100px){        
         font-size:12px;
     }
@@ -201,7 +202,8 @@ const Ul = styled.ul`
     }
     @media (max-width: 700px) {
         font-size: 9px;
-        padding-left: 1.5vh; 
+        padding-left: 1.5vh;
+        gap: 20px; 
     }
     @media (max-width: 620px) {
         font-size: 8px;
@@ -209,12 +211,14 @@ const Ul = styled.ul`
     }
     @media (max-width: 560px) {
         font-size: 7px;
-        padding-left: 1.1vh; 
+        padding-left: 1.1vh;
+        gap:15px; 
     }
     @media (max-width: 480px) {
         font-size: 5px;
         max-height: 40vh;        
-        padding-left: 0;                 
+        padding-left: 0;
+        gap: 10px;                 
     }
     @media (max-width: 400px) {
         font-size: 4px;  
@@ -224,7 +228,7 @@ const Ul = styled.ul`
     }
     @media (max-width: 240px) {
         font-size: 2px;     
-    }
+    }  
 `;
 
 const StyledLink = styled(Link)`
@@ -249,7 +253,8 @@ const StyledLink = styled(Link)`
     width:25vw;    
     height:3.5vh;
     max-height: 60px;
-    text-decoration: none;  
+    text-decoration: none;
+    box-shadow: 0 0 25px ${({ theme }) => theme.shadowColor};   
     @media (max-width: 1168px) {
     font-size: 1.4vh;
     min-width:0;

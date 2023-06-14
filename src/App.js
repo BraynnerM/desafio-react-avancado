@@ -1,10 +1,9 @@
 import React from "react"
-import './App.css';
 import AppRoutes from './pages/routes'
 import styled from 'styled-components';
 import { ThemeProviderComponent } from './contexts/theme-context.js';
-import cabecalhoImage from './images/cabecalho.jpg';
-import lateralImage from './images/lateral.jpg';
+import cabecalhoImage from './assets/cabecalho.jpg';
+import lateralImage from './assets/lateral.jpg';
 import { ThemeTogglerButton } from './components/theme-toggler-button/theme-toggler-button.js';
 
 const App = () => { 

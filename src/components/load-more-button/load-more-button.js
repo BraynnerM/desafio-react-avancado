@@ -18,7 +18,8 @@ export const Button = styled.button`
   min-width:100px;
   width:25vw;
   max-height:90px;
-  height:6.5vh;  
+  height:6.5vh; 
+  box-shadow: 0 0 25px ${({ theme }) => theme.shadowColor};  
   @media (max-width: 1168px) {
     font-size: 2.1vh;
     min-width:0;
@@ -26,10 +27,7 @@ export const Button = styled.button`
     border:solid 0.2em;    
   }
   @media (max-width: 768px) {
-    font-size: 1.75vh;
-    min-width:0;
-    padding: 0;
-    border:solid 0.2em;    
+    font-size: 1.75vh;        
   }
   &:hover {    
     color: ${({ theme }) => (theme === themes.light ? '#cc0000' : '#3b4cca')};  

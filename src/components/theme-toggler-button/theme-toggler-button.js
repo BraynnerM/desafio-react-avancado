@@ -29,15 +29,19 @@ const StyledButton = styled.button`
   width:15vw;
   max-height:60px;
   height:5vh;
+  border: solid 5px;
+  border-radius: 20px;
+  box-shadow: 0 0 25px ${({ theme }) => theme.shadowColor}; 
   @media (max-width: 1168px) {
     font-size: 1.4vh;    
     min-width:0;
-    padding: 0;  
+    padding: 0; 
+    border:solid 0.2em; 
   } 
   @media (max-width: 768px) {
     font-size: 1.2vh;    
-    min-width:80px;
-    padding: 0;  
+    min-width:40px;
+      
   } 
   &:hover {
     background-color: ${({ theme }) => (theme === themes.light ? '#2e2e2e' : '#ffffff')};
