@@ -34,7 +34,7 @@ Os usuários devem ser capazes de:
 ### Links
 
 - URL da solução: [Github](https://github.com/BraynnerM/desafio-react-avancado)
-- URL do site no Github Pages: [Teste técnico - Pokemon Guide](https://braynnerm.github.io/desafio-react-avancado/)
+- URL do site: [Teste técnico - Pokemon Guide](https://https://desafio-react-avancado.vercel.app//)
 
 ### Como Rodar o projeto no seu computador
 
