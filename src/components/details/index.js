@@ -4,6 +4,7 @@ import { useParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { themes } from '../../contexts/theme-context';
+import { getPokemon } from "../../services/requestApi";
 
 const PokeDetails = () => {
     const [details, setDetails] = useState({});
@@ -11,8 +12,7 @@ const PokeDetails = () => {
     const { id } = useParams();
     useEffect(() => {
         async function fetchData() {
-            const response = await fetch(`https://pokeapi.co/api/v2/pokemon/${id}/`);
-            const data = await response.json();
+            const data = await getPokemon(id);
             setDetails(data);
             async function getAbilityDetails(url) {
                 const response = await fetch(url);

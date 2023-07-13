@@ -3,46 +3,70 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { Button } from '../load-more-button/load-more-button.js';
+import { getPokemon, getPokemons, getTypes } from "../../services/requestApi.js";
 
 const PokeList = () => {
+  const paginationLimit = 10;
+  const nonTypeUrl = "https://pokeapi.co/api/v2/type/"
+
+  const [pokemons, setPokemons] = useState([]);
+  const [paginationOffset, setPaginationOffset] = useState(0);
+  const [filteredPaginationOffset, setFilteredPaginationOffset] = useState(10)
   const [types, setTypes] = useState([]);
-  const [tipoSelecionado, setTipoSelecionado] = useState("/pokemon?limit=100000&offset=0");
-  const url = `https://pokeapi.co/api/v2${tipoSelecionado}/`
-  const [quantidadeExibida, setQuantidadeExibida] = useState(10);
-  const [pokemonsFiltrados, setPokemonsFiltrados] = useState([]);
-  const getPokemons = async () => {
-    const response = await fetch(url);
-    return await response.json();
+  const [tipoSelecionado, setTipoSelecionado] = useState(nonTypeUrl);
+  const [pokemonsTipados, setPokemonsTipados] = useState([]);
+  const pokemonsTipadosExibidos = pokemonsTipados.slice(0, filteredPaginationOffset);
+
+  const addPokemons = () => {
+    if (tipoSelecionado === nonTypeUrl) {
+      setFilteredPaginationOffset(10)
+      setPaginationOffset(paginationOffset + paginationLimit)
+    } else {
+      setPaginationOffset(0);
+      setFilteredPaginationOffset(filteredPaginationOffset + paginationLimit)
+    }
   };
-  
-  const pokemonsExibidos = pokemonsFiltrados.slice(0, quantidadeExibida);
-  const handleCarregarMais = () => {
-    setQuantidadeExibida(quantidadeExibida + 10);
-  };
+
+  useEffect(() => {    
+    setPaginationOffset(0);
+    setFilteredPaginationOffset(10)
+  },[tipoSelecionado])
 
   useEffect(() => {
     const fetchData = async () => {
-      const response = await getPokemons();
-      if (response.results) {
-        setPokemonsFiltrados(response.results);
-      } else if (response.pokemon) {
-        const results = response.pokemon.map(poke => poke.pokemon);
-        setPokemonsFiltrados(results);
+      if (tipoSelecionado === nonTypeUrl) {
+        const data = await getPokemons(paginationLimit, paginationOffset);
+        const pokemonsNames = data.map(pokemon => pokemon.name);
+        const pokemonsPromises = pokemonsNames.map(async (pokemonName) => await getPokemon(pokemonName));
+        const paginatedPokemons = await Promise.all(pokemonsPromises);
+
+        const filteredPokemons = paginatedPokemons.filter(pokemon => {
+          return !pokemons.some(existingPokemon => existingPokemon.name === pokemon.name);
+        });
+
+        const allPokemons = [...pokemons, ...filteredPokemons];
+        setPokemons(allPokemons);
+      } else {
+        const data = await getTypes(tipoSelecionado);
+        const typedPokemons = data.pokemon;
+        const pokemonsNames = typedPokemons.map(pokemon => pokemon.pokemon.name);
+        const pokemonsPromises = pokemonsNames.map(async (pokemonName) => await getPokemon(pokemonName));
+        const paginatedPokemons = await Promise.all(pokemonsPromises);
+        const allPokemons = [...paginatedPokemons];
+        setPokemonsTipados(allPokemons);
       }
     };
 
     fetchData();
-  }, [tipoSelecionado]);
+  }, [paginationOffset, tipoSelecionado]);
 
   useEffect(() => {
-    const getTypes = async () => {
-      const response = await fetch('https://pokeapi.co/api/v2/type');
-      const data = await response.json();
-      const types = data.results.map(type => type.name);
-      const filteredTypes = types.filter(type => type !== "unknown" && type !== "shadow");
-      setTypes(filteredTypes);
+    const fetchData = async () => {
+      const data = await getTypes(tipoSelecionado);
+      const types = data.results
+      setTypes(types);
     };
-    getTypes();
+    fetchData();
   }, []);
 
   return (
@@ -53,8 +77,8 @@ const PokeList = () => {
           <RadioButton>
             <input
               type="radio"
-              value="/pokemon?limit=100000&offset=0"
-              checked={tipoSelecionado === "/pokemon?limit=100000&offset=0"}
+              value={nonTypeUrl}
+              checked={tipoSelecionado === nonTypeUrl}
               onChange={(e) => setTipoSelecionado(e.target.value)}
             />
             Todos
@@ -63,30 +87,43 @@ const PokeList = () => {
             <RadioButton key={index}>
               <input
                 type="radio"
-                value={'/type/' + (index + 1).toString()}
-                checked={tipoSelecionado === '/type/' + (index + 1).toString()}
+                value={type.url}
+                checked={tipoSelecionado === type.url}
                 onChange={(e) => setTipoSelecionado(e.target.value)}
               />
-              {type}
+              {type.name}
             </RadioButton>
           ))}
         </TypeList>
       </Types>
-      {pokemonsExibidos.map((pokemon, index) => {
-        const pokemonNumber = pokemon.url.split("/")[6];
+      {tipoSelecionado === nonTypeUrl ? (pokemons.map((pokemon, index) => {
         return (
           <div key={index}>
             <StyledLink to={`/details/${pokemon.name}`}>
               <Div>
                 <H2>{pokemon.name}</H2>
-                <Img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${pokemonNumber}.png`} alt={pokemon.name} />
+                <Img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${(pokemon.id)}.png`} alt={pokemon.name} />
               </Div>
             </StyledLink>
           </div>
         );
-      })}
-      <Button onClick={handleCarregarMais}>Carregar Mais</Button>
-    </Section>
+      })
+      ) : (pokemonsTipadosExibidos.map((pokemon, index) => {
+        return (
+          <div key={index}>
+            <StyledLink to={`/details/${pokemon.name}`}>
+              <Div>
+                <H2>{pokemon.name}</H2>
+                <Img src={`https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${(pokemon.id)}.png`} alt={pokemon.name} />
+              </Div>
+            </StyledLink>
+          </div>
+        );
+      })
+      )
+      }
+      < Button onClick={addPokemons}>Carregar Mais</Button>
+    </Section >
   )
 };
 
@@ -150,20 +187,26 @@ const TypeList = styled.div`
 
 const RadioButton = styled.label`
   display: flex;
-  align-items: center;
+  align-items: center;  
   margin-right: 10px;
   text-transform: capitalize;
   input[type='radio'] {
-    margin-right: 5px;
+    margin-right: 5px;    
   }
   @media (max-width: 1168px) {
     font-size: 14px;  
   } 
   @media (max-width: 768px) {
     font-size: 12px;
+    input {
+      width: 10px;
+    }
   }
   @media (max-width: 480px) {
     font-size: 9px;
+    input {
+      width: 8px;
+    }
   } 
   @media (max-width: 240px) {
     font-size: 5px;

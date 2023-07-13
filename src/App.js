@@ -1,5 +1,5 @@
 import React from "react"
-import AppRoutes from './pages/routes'
+import AppRoutes from './routes'
 import styled from 'styled-components';
 import { ThemeProviderComponent } from './contexts/theme-context.js';
 import cabecalhoImage from './assets/cabecalho.jpg';
