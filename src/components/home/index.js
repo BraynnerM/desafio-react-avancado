@@ -19,18 +19,15 @@ const PokeList = () => {
 
   const addPokemons = () => {
     if (tipoSelecionado === nonTypeUrl) {
-      setFilteredPaginationOffset(10)
+      
       setPaginationOffset(paginationOffset + paginationLimit)
     } else {
-      setPaginationOffset(0);
+      
       setFilteredPaginationOffset(filteredPaginationOffset + paginationLimit)
     }
   };
 
-  useEffect(() => {    
-    setPaginationOffset(0);
-    setFilteredPaginationOffset(10)
-  },[tipoSelecionado])
+  
 
   useEffect(() => {
     const fetchData = async () => {
@@ -58,7 +55,7 @@ const PokeList = () => {
     };
 
     fetchData();
-  }, [paginationOffset, tipoSelecionado]);
+  }, [paginationOffset, pokemons, tipoSelecionado]);
 
   useEffect(() => {
     const fetchData = async () => {
